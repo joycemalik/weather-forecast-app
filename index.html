@@ -3,507 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimalist Pincode Weather</title>
+    <title>Land Potential Analyzer</title>
     <style>
-        :root {
-            --primary-bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --text-color: #333;
-            --accent-color: #007bff;
-            --border-color: #e0e0e0;
-            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
         body {
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-            background-color: var(--primary-bg);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+            background-color: #f8f9fa;
+            color: #343a40;
             line-height: 1.6;
         }
-
+        h1, h2 {
+            color: #0056b3;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-top: 25px;
+        }
         .container {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            padding: 30px;
-            width: 100%;
-            max-width: 900px;
-            margin-bottom: 20px;
-            text-align: center;
-            transition: all 0.3s ease-in-out;
-        }
-
-        h1 {
-            color: var(--accent-color);
-            margin-bottom: 20px;
-            font-size: 2.4em;
-            letter-spacing: -0.5px;
-        }
-
-        .input-section {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .input-section input[type="text"] {
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
+            background-color: #ffffff;
+            padding: 25px;
             border-radius: 8px;
-            font-size: 1em;
-            width: 180px;
-            max-width: 60%;
-            outline: none;
-            transition: border-color 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-
-        .input-section input[type="text"]:focus {
-            border-color: var(--accent-color);
+        input[type="text"] {
+            width: calc(100% - 160px);
+            padding: 12px;
+            margin-right: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
         }
-
-        .input-section button {
-            padding: 12px 25px;
-            background-color: var(--accent-color);
+        button {
+            padding: 12px 20px;
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 1em;
+            border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: background-color 0.2s ease;
+            vertical-align: middle;
         }
-
-        .input-section button:hover {
+        button:hover {
             background-color: #0056b3;
-            transform: translateY(-2px);
         }
-
-        .loading, .error {
-            margin-top: 20px;
-            font-size: 1.1em;
-            font-weight: bold;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            height: 1.5em; /* Reserve space */
-            line-height: 1.5em;
+        #results, #neighbors, #premium-features {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #e9f7ff;
+            border-left: 5px solid #007bff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-
-        .loading.show, .error.show {
-            opacity: 1;
-        }
-
-        .loading {
-            color: var(--accent-color);
-        }
-
-        .error {
-            color: #dc3545;
-        }
-
-        .current-weather {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .current-weather h2 {
-            font-size: 2.8em;
-            margin-bottom: 10px;
-            color: var(--text-color);
-        }
-
-        .current-weather .temp {
-            font-size: 4.5em;
-            font-weight: bold;
-            margin: 10px 0;
-            color: #333;
-            animation: pulse 1.5s infinite alternate; /* Minimal animation */
-        }
-
-        .current-weather .description {
-            font-size: 1.6em;
-            margin-bottom: 15px;
-            text-transform: capitalize;
-            color: #555;
-        }
-
-        .current-weather .details {
-            display: flex;
-            gap: 30px;
-            font-size: 1.15em;
-            color: #777;
-            margin-top: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .weather-icon {
-            font-size: 5em;
-            margin-bottom: 5px;
-            line-height: 1;
-        }
-
-        .forecast-section {
-            margin-top: 40px;
-            text-align: left;
-        }
-
-        .forecast-section h2 {
-            font-size: 2em;
-            margin-bottom: 25px;
-            color: var(--accent-color);
-            text-align: center;
-        }
-
-        .forecast-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 20px;
-            justify-content: center;
-        }
-
-        .forecast-card {
-            background-color: var(--primary-bg);
-            border-radius: 10px;
-            padding: 18px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-            text-align: center;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .forecast-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow);
-        }
-
-        .forecast-card .day {
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 5px;
-            color: var(--accent-color);
-        }
-
-        .forecast-card .date {
-            font-size: 0.95em;
-            color: #777;
+        #results p, #neighbors p, #premium-features p {
             margin-bottom: 10px;
         }
-
-        .forecast-card .icon {
-            font-size: 3em;
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            padding: 0;
+        }
+        li {
             margin-bottom: 5px;
-            line-height: 1;
         }
-
-        .forecast-card .temp {
-            font-weight: bold;
-            font-size: 1.5em;
-            color: #333;
-            margin-top: 8px;
-        }
-        .forecast-card .description {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
-            text-transform: capitalize;
-        }
-
-        .hidden {
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border-left-color: #007bff;
+            animation: spin 1s ease infinite;
             display: none;
+            vertical-align: middle;
+            margin-left: 10px;
         }
-
-        /* Animations */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.02); }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-            }
-            h1 {
-                font-size: 2em;
-            }
-            .input-section {
-                flex-direction: column;
-                align-items: center;
-            }
-            .input-section input[type="text"],
-            .input-section button {
-                width: 90%;
-                max-width: 300px;
-            }
-            .current-weather h2 {
-                font-size: 2em;
-            }
-            .current-weather .temp {
-                font-size: 3.5em;
-            }
-            .current-weather .description {
-                font-size: 1.3em;
-            }
-            .current-weather .details {
-                flex-direction: column;
-                gap: 10px;
-                font-size: 1em;
-            }
-            .weather-icon {
-                font-size: 4em;
-            }
-            .forecast-section h2 {
-                font-size: 1.6em;
-            }
-            .forecast-grid {
-                grid-template-columns: 1fr;
-            }
+        p.intro {
+            font-style: italic;
+            color: #6c757d;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Pincode Weather Forecast</h1>
+        <h1>Land Potential Analyzer</h1>
+        <p class="intro">Unlock the true potential of your land. Our AI-driven analysis identifies optimal renewable energy sources, estimates production, forecasts future yields, and helps you connect with neighbors for energy grids.</p>
 
-        <div class="input-section">
-            <input type="text" id="pincodeInput" placeholder="Enter Pincode (e.g., 90210)">
-            <button id="fetchWeatherButton">Get Weather</button>
+        <p>Enter your land's location (e.g., "Paris, France" or "34.0522, -118.2437"):</p>
+        <input type="text" id="locationInput" placeholder="e.g., London, UK">
+        <button id="analyzeBtn">Analyze Land</button>
+        <div class="spinner" id="loadingSpinner"></div>
+
+        <div id="results">
+            <h2>Analysis Results</h2>
+            <p>Enter a location and click "Analyze Land" to discover your land's energy potential.</p>
         </div>
 
-        <p id="loadingMessage" class="loading hidden">Fetching weather data...</p>
-        <p id="errorMessage" class="error hidden"></p>
+        <div id="neighbors">
+            <h2>Neighboring Land Potential</h2>
+            <p>Discover if nearby landowners share similar energy potential, allowing for collective grid formation.</p>
+            <p id="neighborList">No data available yet.</p>
+        </div>
 
-        <div id="weatherDisplay" class="hidden">
-            <div class="current-weather">
-                <h2 id="currentCity"></h2>
-                <div class="weather-icon" id="currentIcon"></div>
-                <div class="temp"><span id="currentTemp"></span>°C</div>
-                <div class="description" id="currentDescription"></div>
-                <div class="details">
-                    <div>Min Temp: <span id="currentMinTemp"></span>°C</div>
-                    <div>Max Temp: <span id="currentMaxTemp"></span>°C</div>
-                    <div>Humidity: <span id="currentHumidity"></span>%</div>
-                    <div>Wind: <span id="currentWind"></span> m/s</div>
-                </div>
-            </div>
-
-            <div class="forecast-section">
-                <h2>5-Day Forecast</h2>
-                <div id="forecastGrid" class="forecast-grid">
-                    <!-- Forecast cards will be injected here -->
-                </div>
-            </div>
+        <div id="premium-features">
+            <h2>Premium Insights & Hybrid Systems</h2>
+            <p>Our premium plan offers advanced features like personalized hybrid energy system planning, detailed financial analysis, and optimal technology recommendations tailored to your unique land characteristics.</p>
+            <p id="premiumContent">Unlock comprehensive plans for a customized hybrid energy system, optimized for your land's specific needs and local grid conditions.</p>
         </div>
     </div>
 
     <script>
-        const API_KEY = 'YOUR_OPENWEATHERMAP_API_KEY'; // IMPORTANT: Replace with your actual OpenWeatherMap API key
-        const BASE_GEO_URL = 'https://api.openweathermap.org/geo/1.0/zip';
-        const BASE_WEATHER_URL = 'https://api.openweathermap.org/data/2.5/weather';
-        const BASE_FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast';
+        document.addEventListener('DOMContentLoaded', () => {
+            const locationInput = document.getElementById('locationInput');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const resultsDiv = document.getElementById('results');
+            const neighborList = document.getElementById('neighborList');
+            const loadingSpinner = document.getElementById('loadingSpinner');
 
-        const pincodeInput = document.getElementById('pincodeInput');
-        const fetchWeatherButton = document.getElementById('fetchWeatherButton');
-        const loadingMessage = document.getElementById('loadingMessage');
-        const errorMessage = document.getElementById('errorMessage');
-        const weatherDisplay = document.getElementById('weatherDisplay');
+            // --- Simulated API Data and AI Logic ---
 
-        const currentCity = document.getElementById('currentCity');
-        const currentIcon = document.getElementById('currentIcon');
-        const currentTemp = document.getElementById('currentTemp');
-        const currentDescription = document.getElementById('currentDescription');
-        const currentMinTemp = document.getElementById('currentMinTemp');
-        const currentMaxTemp = document.getElementById('currentMaxTemp');
-        const currentHumidity = document.getElementById('currentHumidity');
-        const currentWind = document.getElementById('currentWind');
-        const forecastGrid = document.getElementById('forecastGrid');
+            // Simulates fetching weather data for a given location
+            async function getWeatherData(location) {
+                loadingSpinner.style.display = 'inline-block';
+                await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
 
-        // Maps OpenWeatherMap icon codes to simple Unicode weather characters
-        function getWeatherIcon(iconCode) {
-            switch (iconCode) {
-                case '01d': return '☀️'; // Clear sky day
-                case '01n': return '🌙'; // Clear sky night
-                case '02d': return '🌤️'; // Few clouds day
-                case '02n': return '☁️'; // Few clouds night (often few clouds at night is depicted with moon)
-                case '03d':
-                case '03n': return '☁️'; // Scattered clouds
-                case '04d':
-                case '04n': return '☁️☁️'; // Broken clouds
-                case '09d':
-                case '09n': return '🌧️'; // Shower rain
-                case '10d': return '🌦️'; // Rain day
-                case '10n': return '🌧️'; // Rain night
-                case '11d':
-                case '11n': return '⛈️'; // Thunderstorm
-                case '13d':
-                case '13n': return '❄️'; // Snow
-                case '50d':
-                case '50n': return '🌫️'; // Mist
-                default: return '❓'; // Unknown
-            }
-        }
+                let sunnyDays, windyDays;
+                const lowerLocation = location.toLowerCase();
 
-        // Helper to format date (e.g., "Jan 1")
-        function formatDate(timestamp) {
-            const date = new Date(timestamp * 1000);
-            return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-        }
-
-        // Helper to get day of the week (e.g., "Mon")
-        function getDayOfWeek(timestamp) {
-            const date = new Date(timestamp * 1000);
-            return date.toLocaleDateString('en-US', { weekday: 'short' });
-        }
-
-        async function fetchWeather() {
-            const pincode = pincodeInput.value.trim();
-            if (!pincode) {
-                showError('Please enter a pincode.');
-                return;
-            }
-            if (API_KEY === 'YOUR_OPENWEATHERMAP_API_KEY') {
-                showError('Please replace "YOUR_OPENWEATHERMAP_API_KEY" in the JavaScript code with your actual OpenWeatherMap API key.');
-                return;
+                // Simple mock data based on location keywords for demonstration
+                if (lowerLocation.includes('london') || lowerLocation.includes('uk') || lowerLocation.includes('seattle')) {
+                    sunnyDays = Math.floor(Math.random() * 80) + 120; // 120-200 sunny days
+                    windyDays = Math.floor(Math.random() * 100) + 150; // 150-250 windy days
+                } else if (lowerLocation.includes('desert') || lowerLocation.includes('dubai') || lowerLocation.includes('phoenix') || lowerLocation.includes('las vegas')) {
+                    sunnyDays = Math.floor(Math.random() * 50) + 280; // 280-330 sunny days
+                    windyDays = Math.floor(Math.random() * 50) + 50; // 50-100 windy days
+                } else if (lowerLocation.includes('netherlands') || lowerLocation.includes('denmark') || lowerLocation.includes('chicago')) {
+                    sunnyDays = Math.floor(Math.random() * 80) + 100; // 100-180 sunny days
+                    windyDays = Math.floor(Math.random() * 100) + 200; // 200-300 windy days
+                } else if (lowerLocation.includes('california') || lowerLocation.includes('madrid')) {
+                    sunnyDays = Math.floor(Math.random() * 80) + 220; // 220-300 sunny days
+                    windyDays = Math.floor(Math.random() * 80) + 100; // 100-180 windy days
+                } else { // Default / generic
+                    sunnyDays = Math.floor(Math.random() * 150) + 150; // 150-300 sunny days
+                    windyDays = Math.floor(Math.random() * 150) + 100; // 100-250 windy days
+                }
+                
+                loadingSpinner.style.display = 'none';
+                return { sunnyDays, windyDays };
             }
 
-            showLoading(true);
-            hideError();
-            hideWeatherDisplay();
-
-            try {
-                // 1. Get coordinates (latitude, longitude) and city name from pincode
-                // Assuming 'US' for pincode, adjust if other countries are needed.
-                const geoResponse = await fetch(`${BASE_GEO_URL}?zip=${pincode},US&appid=${API_KEY}`);
-                if (!geoResponse.ok) {
-                    throw new Error(`Pincode not found or API error: ${geoResponse.statusText}`);
+            // "AI" logic to suggest best renewable source based on weather data
+            function suggestRenewableSource(weatherData) {
+                const { sunnyDays, windyDays } = weatherData;
+                if (sunnyDays > windyDays * 1.5) { // Significantly more sun
+                    return {
+                        source: "Solar Power",
+                        details: "Your land receives abundant sunshine. Solar panels are highly recommended for maximizing energy production.",
+                        potential: "High Solar Potential"
+                    };
+                } else if (windyDays > sunnyDays * 1.2) { // Significantly more wind
+                    return {
+                        source: "Wind Energy",
+                        details: "Strong and consistent winds make wind turbines an excellent choice for your location.",
+                        potential: "High Wind Potential"
+                    };
+                } else {
+                    return {
+                        source: "Hybrid Solar-Wind System",
+                        details: "Your land has a balanced potential for both solar and wind. A hybrid system would be optimal for stable and diversified energy generation.",
+                        potential: "Balanced Potential (Solar & Wind)"
+                    };
                 }
-                const geoData = await geoResponse.json();
-
-                if (!geoData.lat || !geoData.lon) {
-                    throw new Error('Could not get coordinates for the provided pincode. Please check the pincode.');
-                }
-
-                const { lat, lon, name } = geoData; // 'name' will be the city name
-
-                // 2. Fetch current weather data
-                const weatherResponse = await fetch(`${BASE_WEATHER_URL}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`);
-                if (!weatherResponse.ok) {
-                    throw new Error(`Current weather API error: ${weatherResponse.statusText}`);
-                }
-                const weatherData = await weatherResponse.json();
-
-                // 3. Fetch 5-day / 3-hour forecast data
-                const forecastResponse = await fetch(`${BASE_FORECAST_URL}?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`);
-                if (!forecastResponse.ok) {
-                    throw new Error(`Forecast API error: ${forecastResponse.statusText}`);
-                }
-                const forecastData = await forecastResponse.json();
-
-                renderCurrentWeather(weatherData, name);
-                renderForecast(forecastData);
-                showWeatherDisplay();
-
-            } catch (error) {
-                console.error('Error fetching weather:', error);
-                showError(error.message || 'Failed to fetch weather data. Please check the pincode and your API key.');
-            } finally {
-                showLoading(false);
             }
-        }
 
-        function renderCurrentWeather(data, cityNameFromGeo) {
-            currentCity.textContent = data.name || cityNameFromGeo || 'Unknown City';
-            currentIcon.innerHTML = getWeatherIcon(data.weather[0].icon);
-            currentTemp.textContent = Math.round(data.main.temp);
-            currentDescription.textContent = data.weather[0].description;
-            currentMinTemp.textContent = Math.round(data.main.temp_min);
-            currentMaxTemp.textContent = Math.round(data.main.temp_max);
-            currentHumidity.textContent = data.main.humidity;
-            currentWind.textContent = data.wind.speed;
-        }
+            // Estimates energy production for a given source
+            function estimateEnergyProduction(source, weatherData) {
+                const { sunnyDays, windyDays } = weatherData;
+                const landSizeFactor = 1000; // Arbitrary factor for land size, representing available area in square meters
+                const dailyHoursSun = 5; // Average daily peak sun hours
+                const dailyHoursWind = 8; // Average daily hours of usable wind
+                const solarPanelEfficiency = 0.18; // 18% efficiency
+                const windTurbineCapacityFactor = 0.35; // 35% capacity factor
 
-        function renderForecast(data) {
-            forecastGrid.innerHTML = ''; // Clear previous forecast
+                let estimatedEnergyKWH = 0;
+                let details = "";
 
-            const dailyForecasts = {}; // To store one representative entry per day
-            const today = new Date().toLocaleDateString('en-US'); // Format for comparison, no time
+                if (source.includes("Solar")) {
+                    // Assume 10% of land_size_factor for panel area, 1 kW/sq meter incident solar radiation
+                    const solarArea = landSizeFactor * 0.1; // 10% of land size for panels
+                    const solarProduction = sunnyDays * dailyHoursSun * solarArea * solarPanelEfficiency; // kWh/year
+                    estimatedEnergyKWH += solarProduction;
+                    details += `Assuming ~${solarArea.toFixed(0)} sq meters of solar panels could yield approximately ${solarProduction.toFixed(0)} kWh/year.\n`;
+                }
+                if (source.includes("Wind")) {
+                    // Assume 1 small turbine, 2kW rated power
+                    const turbinePower = 2; // kW
+                    const windProduction = windyDays * 24 * turbinePower * windTurbineCapacityFactor; // kWh/year
+                    estimatedEnergyKWH += windProduction;
+                    details += `A small 2kW wind turbine could produce around ${windProduction.toFixed(0)} kWh/year.\n`;
+                }
+                if (source.includes("Hybrid")) { 
+                    // For hybrid, combine both calculations with slightly reduced individual installations
+                    const solarArea = landSizeFactor * 0.05; // 5% for solar
+                    const solarProduction = sunnyDays * dailyHoursSun * solarArea * solarPanelEfficiency;
+                    const turbinePower = 1.5; // kW for smaller turbine
+                    const windProduction = windyDays * 24 * turbinePower * windTurbineCapacityFactor;
+                    estimatedEnergyKWH = solarProduction + windProduction;
+                    details += `A combined system, with ~${solarArea.toFixed(0)} sq meters of solar panels and a 1.5kW wind turbine, could yield approximately ${solarProduction.toFixed(0)} kWh/year from solar and ${windProduction.toFixed(0)} kWh/year from wind, totaling:\n`;
+                }
 
-            data.list.forEach(item => {
-                const itemDate = new Date(item.dt * 1000);
-                const itemDateString = itemDate.toLocaleDateString('en-US');
+                return {
+                    total: estimatedEnergyKWH.toFixed(0),
+                    details: details.trim()
+                };
+            }
 
-                // Skip today's forecast since current weather is already displayed
-                if (itemDateString === today) {
+            // Simple energy forecasting for the next 7 days
+            function forecastEnergy(baseProductionKWH) {
+                let forecast = [];
+                const avgDailyKWH = baseProductionKWH / 365;
+                for (let i = 1; i <= 7; i++) {
+                    const dailyVariation = (Math.random() - 0.5) * 0.2 * avgDailyKWH; // +/- 10% daily variation
+                    forecast.push(`Day ${i}: ${(avgDailyKWH + dailyVariation).toFixed(2)} kWh`);
+                }
+                return forecast.join(', ');
+            }
+
+            // Simulates finding neighbors with similar potential
+            async function findNeighbors(potentialType) {
+                await new Promise(resolve => setTimeout(resolve, 800)); // Simulate delay
+                const nearbyLands = [
+                    `Green Valley Eco-Park (${potentialType})`,
+                    `Sunny Ridge Estate (${potentialType})`,
+                    `Windy Heights Cooperative (${potentialType.includes('Wind') ? potentialType : 'High Wind Potential'})`,
+                    `Solar Bloom Community (${potentialType.includes('Solar') ? potentialType : 'High Solar Potential'})`,
+                    `Harmony Fields (${potentialType})`
+                ];
+                // Return 1-3 random neighbors, filtering for variety
+                return nearbyLands
+                    .filter((_, i) => Math.random() > 0.3) // Randomly include/exclude
+                    .sort(() => 0.5 - Math.random()) // Shuffle
+                    .slice(0, Math.floor(Math.random() * 3) + 1); // Get 1 to 3
+            }
+
+            // --- Event Listener ---
+            analyzeBtn.addEventListener('click', async () => {
+                const location = locationInput.value.trim();
+                if (!location) {
+                    resultsDiv.innerHTML = '<h2>Analysis Results</h2><p style="color: red;">Please enter a location to analyze.</p>';
+                    neighborList.textContent = 'No data available yet.';
                     return;
                 }
 
-                // If no entry for this day yet, or if current item is closer to noon, store it
-                // This aims to get a representative daily forecast (e.g., mid-day)
-                if (!dailyForecasts[itemDateString]) {
-                    dailyForecasts[itemDateString] = item;
-                } else {
-                    const existingItemDate = new Date(dailyForecasts[itemDateString].dt * 1000);
-                    if (Math.abs(itemDate.getHours() - 12) < Math.abs(existingItemDate.getHours() - 12)) {
-                        dailyForecasts[itemDateString] = item;
+                resultsDiv.innerHTML = '<h2>Analysis Results</h2><p>Analyzing land potential for <strong>' + location + '</strong>... Please wait.</p>';
+                neighborList.textContent = 'Searching for compatible neighbors...';
+
+                try {
+                    const weatherData = await getWeatherData(location);
+                    const recommendation = suggestRenewableSource(weatherData);
+                    const energyEstimate = estimateEnergyProduction(recommendation.source, weatherData);
+                    const energyForecast = forecastEnergy(parseInt(energyEstimate.total));
+                    const neighbors = await findNeighbors(recommendation.potential);
+
+                    resultsDiv.innerHTML = `
+                        <h2>Analysis Results for ${location}</h2>
+                        <p><strong>Geo-strategic & Weather Conditions:</strong> Based on historical patterns, your land is estimated to experience approximately <strong>${weatherData.sunnyDays} sunny days</strong> and <strong>${weatherData.windyDays} windy days</strong> per year.</p>
+                        <p><strong>Recommended Renewable Energy Source:</strong> <strong>${recommendation.source}</strong></p>
+                        <p>${recommendation.details}</p>
+                        <p><strong>Estimated Annual Energy Production:</strong> <strong>${energyEstimate.total} kWh/year</strong></p>
+                        <p>${energyEstimate.details}</p>
+                        <p><strong>Energy Forecasting (Next 7 Days):</strong> ${energyForecast}</p>
+                    `;
+
+                    if (neighbors.length > 0) {
+                        neighborList.innerHTML = `Potentially compatible neighbors for a shared energy grid: <ul>${neighbors.map(n => `<li>${n}</li>`).join('')}</ul>`;
+                    } else {
+                        neighborList.textContent = 'No immediate neighbors with similar potential found for a joint grid at this time. Keep an eye out for future opportunities!';
                     }
+
+                } catch (error) {
+                    resultsDiv.innerHTML = '<h2>Analysis Results</h2><p style="color: red;">Error analyzing location: ' + error.message + '. Please try again.</p>';
+                    neighborList.textContent = 'Failed to retrieve neighbor data.';
+                    loadingSpinner.style.display = 'none';
                 }
             });
-
-            // Convert object to array and sort by date
-            const sortedForecasts = Object.values(dailyForecasts).sort((a, b) => a.dt - b.dt);
-
-            // Display up to 5 days of forecast
-            sortedForecasts.slice(0, 5).forEach(item => {
-                const forecastCard = document.createElement('div');
-                forecastCard.classList.add('forecast-card');
-
-                forecastCard.innerHTML = `
-                    <div class="day">${getDayOfWeek(item.dt)}</div>
-                    <div class="date">${formatDate(item.dt)}</div>
-                    <div class="icon">${getWeatherIcon(item.weather[0].icon)}</div>
-                    <div class="temp">${Math.round(item.main.temp)}°C</div>
-                    <div class="description">${item.weather[0].description}</div>
-                `;
-                forecastGrid.appendChild(forecastCard);
-            });
-        }
-
-        function showLoading(show) {
-            loadingMessage.classList.toggle('show', show);
-        }
-
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.add('show');
-        }
-
-        function hideError() {
-            errorMessage.textContent = '';
-            errorMessage.classList.remove('show');
-        }
-
-        function showWeatherDisplay() {
-            weatherDisplay.classList.remove('hidden');
-        }
-
-        function hideWeatherDisplay() {
-            weatherDisplay.classList.add('hidden');
-        }
-
-        // Event listeners for button click and Enter key on input
-        fetchWeatherButton.addEventListener('click', fetchWeather);
-        pincodeInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                fetchWeather();
-            }
         });
     </script>
 </body>
